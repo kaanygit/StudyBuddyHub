@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:studybuddyhub/screens/auth_screen.dart';
 import 'package:studybuddyhub/screens/home_screen.dart';
 import 'firebase_options.dart';
@@ -8,9 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Gemini.init(
-      apiKey: const String.fromEnvironment("GEMINI_API_KEY"),
-      enableDebugging: true);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

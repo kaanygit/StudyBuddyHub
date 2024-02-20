@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:studybuddyhub/constants/fonts.dart';
 import 'package:studybuddyhub/firebase/auth.dart';
+import 'package:studybuddyhub/firebase/firestore.dart';
 import 'package:studybuddyhub/screens/auth_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -12,31 +12,21 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  Map<String, dynamic> _currentUserProfile = {
-    'userPhoto': '',
-    'userName': '',
-    'userEducationLevel': '',
-    'userTelephoneNumber': '',
-    'userEmail': ''
-  };
+  final FirestoreMethods _firestoreMethods = FirestoreMethods();
+
+  Map<String, dynamic> userProfile = {};
   bool loadingProfile = true;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      if (user == null) {
-        print("Kullanıcı bulunamadı");
-      } else {
-        setState(() {
-          _currentUserProfile['userPhoto'] = user.photoURL ?? '';
-          _currentUserProfile['userName'] = user.displayName ?? '';
-          _currentUserProfile['userEmail'] = user.email ?? '';
-          _currentUserProfile['userTelephoneNumber'] = user.phoneNumber ?? '';
-          loadingProfile = false;
-        });
-      }
-    });
+    _initializeUserProfile();
+  }
+
+  Future<void> _initializeUserProfile() async {
+    userProfile = await _firestoreMethods.getProfileBio();
+    loadingProfile = false;
+    print(userProfile);
   }
 
   @override
@@ -55,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage:
-                            NetworkImage(_currentUserProfile['userPhoto']),
+                            NetworkImage(userProfile['profilePhoto']),
                       ))
                   : Container(
                       alignment: Alignment.center,
@@ -91,9 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
                         Text(
-                          !loadingProfile
-                              ? _currentUserProfile['userName']
-                              : "Null",
+                          !loadingProfile ? userProfile['displayName'] : "Null",
                           style: fontStyle(17, Colors.black, FontWeight.bold),
                         ),
                       ],
@@ -107,7 +95,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text("Education Level",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text("Null",
+                        Text(
+                            !loadingProfile
+                                ? userProfile['educationLevel']
+                                : "Null",
                             style:
                                 fontStyle(17, Colors.black, FontWeight.bold)),
                       ],
@@ -123,7 +114,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: fontStyle(
                               17, Colors.grey.shade800, FontWeight.normal),
                         ),
-                        Text("Null",
+                        Text(!loadingProfile ? userProfile['address'] : "Null",
                             style:
                                 fontStyle(17, Colors.black, FontWeight.bold)),
                       ],
@@ -161,9 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
                         Text(
-                          _currentUserProfile['userTelephoneNumber'] == ""
-                              ? "Null"
-                              : _currentUserProfile['userTelephoneNumber'],
+                          !loadingProfile ? userProfile['phoneNumber'] : "Null",
                           style: fontStyle(17, Colors.black, FontWeight.bold),
                         ),
                       ],
@@ -177,10 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text("Email",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text(
-                            !loadingProfile
-                                ? _currentUserProfile['userEmail']
-                                : "Null",
+                        Text(!loadingProfile ? userProfile['email'] : "Null",
                             style:
                                 fontStyle(17, Colors.black, FontWeight.bold)),
                       ],
@@ -200,6 +186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ElevatedButton(
                         onPressed: () {
                           print("Edit Personal Data");
+                          FirestoreMethods().setEditProfileBio('Bornovaİzmir',
+                              'Kaan', 'University', '5375019024');
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: textColorThree,

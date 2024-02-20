@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gemini/flutter_gemini.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:studybuddyhub/constants/fonts.dart';
+import 'package:studybuddyhub/firebase/firestore.dart';
+import 'package:studybuddyhub/services/gemini.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -13,15 +15,25 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _chatTextBoxController = TextEditingController();
-  final gemini = Gemini.instance;
-
-  bool isGeminiVisiable = true;
+  bool _isLoadingGeminiChat = false;
+  final Gemini _gemini = Gemini();
+  List<String> _responseGemini = [];
+  List<String> _responseUser = [];
+  List<String> _allResponse = [];
+  String? _returnResponse = "";
+  String? _sendResponse = "";
+  bool isGeminiVisible = true;
   String? currentUserPhoto;
+
+  Map<String, dynamic> userProfile = {};
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _initializeUserProfile();
+    _responseUser = [];
+    _responseGemini = [];
+    _allResponse = [];
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user == null) {
         print("Kullanıcı bulunamadı");
@@ -34,15 +46,27 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  Future<void> _initializeUserProfile() async {
+    userProfile = await FirestoreMethods().getProfileBio();
+    print(userProfile);
+
+    _responseUser = [];
+
+    // State değişikliklerini tetikle
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Stack(
         children: [
-          if (isGeminiVisiable)
+          if (isGeminiVisible)
             Positioned(
-              top: MediaQuery.of(context).size.height / 2 - 50,
+              top: MediaQuery.of(context).size.height / 2 - 150,
               right: 0,
               left: 0,
               child: Container(
@@ -68,139 +92,152 @@ class _ChatScreenState extends State<ChatScreen> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  reverse: true,
                   physics: BouncingScrollPhysics(),
-                  child: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (int i = 0; i < _allResponse.length; i++)
+                        Column(
                           children: [
-                            Container(
-                                child: currentUserPhoto != null
-                                    ? Image.network("$currentUserPhoto",
-                                        width: 50, height: 50)
-                                    : Container(
-                                        width: 50,
-                                        height: 50,
-                                        color: Colors.grey,
-                                      )),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Text(
-                                "Got my createive ideas for a 10 year old's birtday",
-                                style: fontStyle(
-                                    14, Colors.black, FontWeight.normal),
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(25)),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      child: i % 2 == 0
+                                          ? currentUserPhoto != null
+                                              ? ClipOval(
+                                                  child: Image.network(
+                                                    "$currentUserPhoto",
+                                                    width: 50,
+                                                    height: 50,
+                                                  ),
+                                                )
+                                              : Container(
+                                                  width: 50,
+                                                  height: 50,
+                                                  color: Colors.grey,
+                                                )
+                                          : ClipOval(
+                                              child: Image.asset(
+                                                "assets/images/gemini_logo.png",
+                                                width: 50,
+                                                height: 50,
+                                              ),
+                                            ),
+                                    ),
+                                    SizedBox(
+                                      width: 15,
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _responseUser[i],
+                                        style: fontStyle(
+                                          14,
+                                          Colors.black,
+                                          FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
+                            ),
+                            SizedBox(
+                              height: 10,
                             )
                           ],
-                        )),
-                        SizedBox(
-                          height: 10,
                         ),
-                        Container(
-                            child: Row(
-                          children: [
-                            Container(
-                                child: Image.asset(
-                                    "assets/images/gemini_logo.png",
-                                    width: 50,
-                                    height: 50)),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Expanded(
-                              child: Text(
-                                'Bu hatayı çözmek için, currentUserPhoto değişkenini late olarak tanımlamak yerine, null olarak başlatıp ardından kullanıcı bilgisi gelirse güncellemek daha iyi bir yol olabilir. Aşağıda bu yaklaşımı kullanarak bir örnek görebilirsiniz:',
-                                style: fontStyle(
-                                    14, Colors.black, FontWeight.normal),
-                              ),
-                            )
-                          ],
-                        )),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                      margin: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.circular(30), // Yuvarlak kenarlıklar
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _chatTextBoxController,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10,
-                                  horizontal: 16,
-                                ),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Message",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide
-                                      .none, // Border'ın kenarlığını kaldırma
-                                ),
+              // Alt kısım (Input ve diğer widget'lar)
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _chatTextBoxController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: 10,
+                                horizontal: 16,
+                              ),
+                              fillColor: Colors.grey.shade200,
+                              filled: true,
+                              hintText: "Message",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
                               ),
                             ),
+                            enabled: !_isLoadingGeminiChat,
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: textColorTwo,
-                              border: Border.all(
-                                color: Colors.white,
-                                width: 0.5,
-                              ),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: textColorTwo,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 0.5,
                             ),
-                            child: InkWell(
-                              onTap: () {
-                                print("Gönder");
+                          ),
+                          child: InkWell(
+                            onTap: () async {
+                              setState(() {
+                                _isLoadingGeminiChat = true;
+                                _sendResponse =
+                                    _chatTextBoxController.text.trim();
+                                _responseUser.add(_sendResponse!);
+                                _allResponse.add(_sendResponse!);
+                                isGeminiVisible = false;
+                              });
 
-                                setState(() {
-                                  if (_chatTextBoxController.text != "") {
-                                    isGeminiVisiable = false;
-                                    print(_chatTextBoxController.text);
-                                    gemini
-                                        .text(_chatTextBoxController.text)
-                                        .then((value) => print(value?.output))
-                                        .catchError((error) => print(
-                                            "Gönderilirken bir hata oluştu : $error"));
-                                  }
-                                });
-                              },
-                              child: FaIcon(
-                                FontAwesomeIcons.arrowUp,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                              final String text =
+                                  _chatTextBoxController.text.trim();
+                              _returnResponse =
+                                  await _gemini.geminiTextPrompt(text);
+                              _responseGemini.add(_returnResponse!);
+
+                              setState(() {
+                                _isLoadingGeminiChat = false;
+                                _responseUser.add(_returnResponse!);
+                                _allResponse.add(_returnResponse!);
+                                _chatTextBoxController.clear();
+                                _chatTextBoxController.text = "";
+                                FirestoreMethods().setGeminiChat(_allResponse);
+                                _chatTextBoxController.selection =
+                                    TextSelection.fromPosition(
+                                  TextPosition(offset: 0),
+                                );
+                              });
+                            },
+                            child: FaIcon(
+                              FontAwesomeIcons.arrowUp,
+                              color: Colors.white,
+                              size: 20,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
