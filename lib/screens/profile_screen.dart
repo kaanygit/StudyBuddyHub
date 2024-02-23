@@ -24,8 +24,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _initializeUserProfile() async {
-    userProfile = await _firestoreMethods.getProfileBio();
-    loadingProfile = false;
+    Map<String, dynamic> user = await _firestoreMethods.getProfileBio();
+    setState(() {
+      userProfile = user;
+      loadingProfile = false;
+    });
     print(userProfile);
   }
 

@@ -32,6 +32,7 @@ class AuthMethods {
             'educationLevel': '',
             'address': '',
             'email': user.email,
+            'examList': [],
             'createdAt': DateTime.now()
           });
         }
@@ -65,7 +66,8 @@ class AuthMethods {
             await _firestore.collection('users').doc(user.uid).set({
               'displayName': user.displayName,
               'uid': user.uid,
-              'profilePhoto': user.photoURL
+              'profilePhoto': user.photoURL,
+              'examList': []
             });
           }
           result = true;

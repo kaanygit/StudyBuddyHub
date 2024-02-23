@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:studybuddyhub/constants/fonts.dart';
 import 'package:studybuddyhub/firebase/firestore.dart';
 import 'package:studybuddyhub/services/gemini.dart';
@@ -27,8 +31,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Map<String, dynamic> userProfile = {};
 
+  bool _imageSet = false;
+  late File _image;
+  final picker = ImagePicker();
+
   @override
   void initState() {
+    _image = File('');
     super.initState();
     _initializeUserProfile();
     _responseUser = [];
@@ -44,6 +53,58 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
     });
+  }
+
+  Future getImageFromGallery() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        print("resim seçildi");
+        _imageSet = true;
+        print(_image);
+      }
+    });
+  }
+
+  Future getImageFromCamera() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+        print("resim çekildi");
+        _imageSet = true;
+        print(_image);
+      }
+    });
+  }
+
+  Future showOptions() async {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoActionSheet(
+        actions: [
+          CupertinoActionSheetAction(
+            child: Text('Photo Gallery'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from gallery
+              getImageFromGallery();
+            },
+          ),
+          CupertinoActionSheetAction(
+            child: Text('Camera'),
+            onPressed: () {
+              // close the options modal
+              Navigator.of(context).pop();
+              // get image from camera
+              getImageFromCamera();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _initializeUserProfile() async {
@@ -187,6 +248,53 @@ class _ChatScreenState extends State<ChatScreen> {
                         SizedBox(
                           width: 10,
                         ),
+                        if (!_imageSet)
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: textColorTwo,
+                                border: Border.all(
+                                    color: Colors.white, width: 0.5)),
+                            child: InkWell(
+                              onTap: () {
+                                print("Rs");
+                                showOptions();
+                              },
+                              child: Center(
+                                child: FaIcon(
+                                  FontAwesomeIcons.images,
+                                  size: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.green,
+                                border: Border.all(
+                                    color: Colors.white, width: 0.5)),
+                            child: InkWell(
+                              onTap: () {
+                                print("Rs");
+                                showOptions();
+                              },
+                              child: Center(
+                                child: FaIcon(
+                                  FontAwesomeIcons.check,
+                                  size: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        SizedBox(
+                          width: 2,
+                        ),
                         Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -210,8 +318,10 @@ class _ChatScreenState extends State<ChatScreen> {
 
                               final String text =
                                   _chatTextBoxController.text.trim();
-                              _returnResponse =
-                                  await _gemini.geminiTextPrompt(text);
+                              _returnResponse = _imageSet
+                                  ? await _gemini.geminiTextPrompt(text)
+                                  : await _gemini.geminImageAndTextPrompt(
+                                      (text), _image.path);
                               _responseGemini.add(_returnResponse!);
 
                               setState(() {
@@ -221,6 +331,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 _chatTextBoxController.clear();
                                 _chatTextBoxController.text = "";
                                 FirestoreMethods().setGeminiChat(_allResponse);
+                                _imageSet = false;
                                 _chatTextBoxController.selection =
                                     TextSelection.fromPosition(
                                   TextPosition(offset: 0),
