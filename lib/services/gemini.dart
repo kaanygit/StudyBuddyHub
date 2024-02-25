@@ -13,7 +13,8 @@ class Gemini {
   }
 
   Future<String> getApiKey() async {
-    String? apiKey = dotenv.env['GEMINI_API_KEY'];
+    String? apiKey = dotenv.env['AIzaSyCzwdTTAjkiUg2eLZ_UwWNoXLpWhqywkqo'];
+    // String? apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey == null) {
       return "null";
     }

@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:provider/provider.dart';
-import 'package:studybuddyhub/screens/create_exam_screen.dart';
 
 class FirestoreMethods {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -67,6 +64,8 @@ class FirestoreMethods {
       return {};
     }
   }
+
+
 
   Future<void> setExamProfileFirestore(
       List<Map<String, dynamic>> examList) async {
