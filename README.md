@@ -33,9 +33,10 @@ To set up the application locally, follow these steps:
  
  
 2.Navigate to the project directory:
-	```bash
-	cd StudyBuddyHub
-	```
+    ```bash	
+    cd StudyBuddyHub
+	
+ 
 3.Install the required dependencies:
 ```bash
 	flutter pub get
