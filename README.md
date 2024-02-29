@@ -26,7 +26,6 @@ Google Gemini AI helps users create exams automatically by taking a photo of the
 
 ## Installation
 
-To set up the application locally, follow these steps:
 
 1. Clone the repository:
  
