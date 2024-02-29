@@ -35,21 +35,21 @@ To set up the application locally, follow these steps:
  
 2.Navigate to the project directory:
 
-    ```bash	
+    ```
     cd StudyBuddyHub
-    
+    ```
  
 3.Install the required dependencies:
 
-    ```bash
+    ```
 	flutter pub get
-    
+    ```
 
 4.Run the application:
 
-    ```bash
+    ```
         flutter run 
-    
+    ```
 
 ## Contribution
 If you would like to contribute to the application, please refer to the [CONTRIBUTING.md](https://chat.openai.com/c/CONTRIBUTING.md) file. Your contributions are welcome!
