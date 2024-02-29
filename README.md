@@ -54,6 +54,23 @@ Google Gemini AI helps users create exams automatically by taking a photo of the
 ## Contribution
 If you would like to contribute to the application, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file. Your contributions are welcome!
 
+## Used Dependencies
+- firebase_core
+- cloud_firestore
+- firebase_auth
+- google_sign_in
+- shared_preferences
+- provider
+- font_awesome_flutter
+- flutter_dotenv
+- google_generative_ai
+- flutter_facebook_auth
+- google_ml_kit
+- google_mlkit_text_recognition
+- image_picker
+- confetti
+- page_transition
+
 
 ## License
 This project is licensed under the MIT License.
