@@ -105,8 +105,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    primary: textColor,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: textColor,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0))),
                 onPressed: () {

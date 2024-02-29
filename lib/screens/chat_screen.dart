@@ -24,7 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<String> _responseGemini = [];
   List<String> _responseUser = [];
   List<String> _allResponse = [];
-  String? _returnResponse = "";
+  String _returnResponse = "";
   String? _sendResponse = "";
   bool isGeminiVisible = true;
   String? currentUserPhoto;
@@ -318,11 +318,31 @@ class _ChatScreenState extends State<ChatScreen> {
 
                               final String text =
                                   _chatTextBoxController.text.trim();
-                              _returnResponse = _imageSet
-                                  ? await _gemini.geminiTextPrompt(text)
-                                  : await _gemini.geminImageAndTextPrompt(
-                                      (text), _image.path);
-                              _responseGemini.add(_returnResponse!);
+                              // _returnResponse = (_imageSet
+                              //     ? await _gemini.geminiTextPrompt(text)
+                              //     : await _gemini.geminImageAndTextPrompt(
+                              //         (text), _image.path))!;
+                              var response;
+
+                              if (!_imageSet) {
+                                response = await _gemini.geminiTextPrompt(text);
+                              } else {
+                                if (_image != null &&
+                                    _image.path != null &&
+                                    _image.path.isNotEmpty) {
+                                  response =
+                                      await _gemini.geminImageAndTextPrompt(
+                                          text, _image.path);
+                                } else {
+                                  // Handle the case where _image or _image.path is null or empty
+                                  // You might want to log a warning, provide a default response, or take other appropriate actions.
+                                  response =
+                                      'Default response'; // Change this line based on your requirements
+                                }
+                              }
+
+                              _returnResponse = response;
+                              _responseGemini.add(_returnResponse);
 
                               setState(() {
                                 _isLoadingGeminiChat = false;

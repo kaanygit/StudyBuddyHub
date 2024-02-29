@@ -33,7 +33,11 @@ class AuthMethods {
             'address': '',
             'email': user.email,
             'examList': [],
-            'createdAt': DateTime.now()
+            'daily_counter': 0,
+            'updatedUser': DateTime.now(),
+            'createdAt': DateTime.now(),
+            'daily_goal': 0,
+            'daily_goal_active': false
           });
         }
         result = true;

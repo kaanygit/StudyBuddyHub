@@ -13,8 +13,7 @@ class Gemini {
   }
 
   Future<String> getApiKey() async {
-    String? apiKey = dotenv.env['AIzaSyCzwdTTAjkiUg2eLZ_UwWNoXLpWhqywkqo'];
-    // String? apiKey = dotenv.env['GEMINI_API_KEY'];
+    String? apiKey = dotenv.env['GEMINI_API_KEY'];
     if (apiKey == null) {
       return "null";
     }
@@ -28,6 +27,7 @@ class Gemini {
           GenerativeModel(model: 'gemini-1.0-pro', apiKey: googleGeminiApiKey);
       final prompt = TextPart(userPrompt);
       final response = await model.generateContent([Content.text(prompt.text)]);
+      print("Resimsiz geldi");
       print(response.text);
       return response.text;
     } catch (e) {
@@ -62,6 +62,28 @@ class Gemini {
     }
   }
 
+  Future<List<String>> geminiQuestionAnswerPrompt(
+      List<String> questionListFowardGemini) async {
+    try {
+      await initializeGemini();
+      List<String> answers = [];
+      String questions = "";
+      for (final question in questionListFowardGemini) {
+        questions += question + ",";
+      }
+      final model =
+          GenerativeModel(model: 'gemini-1.0-pro', apiKey: googleGeminiApiKey);
+      final prompt = TextPart(questions +
+          "=> bana  ${questionListFowardGemini.length} tane sorunun sadece cevaplarını dizi olarak yolla.");
+      final response = await model.generateContent([Content.text(prompt.text)]);
+      print(response.text);
+      return answers;
+    } catch (e) {
+      print("Prompt alınırken bir hata oluştu : $e");
+      return [];
+    }
+  }
+
   Future<String?> geminImageAndTextPrompt(
       String userPrompt, String imagePath) async {
     try {
@@ -75,6 +97,7 @@ class Gemini {
       final response = await model.generateContent([
         Content.multi([prompt, ...imageParts])
       ]);
+      print("Gemini Image And Text Prompt");
       print(response.text);
       return response.text;
     } catch (e) {

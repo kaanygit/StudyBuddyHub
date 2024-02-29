@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:studybuddyhub/constants/fonts.dart';
 import 'package:studybuddyhub/services/ocr.dart';
@@ -18,7 +19,6 @@ class _CreateExamScreenState extends State<CreateExamScreen> {
   late PageController _pageController;
   int _currentPageIndex = 0;
   bool loading = false;
-// final loading = watch(loadingProvider).state;
   bool _imageSelected = false;
   late File _image;
   final picker = ImagePicker();
@@ -151,6 +151,7 @@ class _CreateExamScreenState extends State<CreateExamScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: backgroundColor,
         leading: GestureDetector(
           onTap: () {
             if (_currentPageIndex > 0) {
@@ -177,31 +178,42 @@ class _CreateExamScreenState extends State<CreateExamScreen> {
                 onPressed: () {
                   showOptions();
                 },
-                child: Text("Resim Seç"),
+                child: Text("Select Image"),
               ),
             ),
           ),
-          // Ekran 2: Analiz Ediliyor (Loading Ekranı)
+          // Screen 2: Analyzing (Loading Screen)
           Container(
             child: Center(
               child: LoadingScreen(),
             ),
           ),
-          // Ekran 3: Oluşan Sorular
+          // Screen 3: Generated Questions
           Container(
+            color: backgroundColor,
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Oluşan Sorular"),
-                  Text("Kaç Soru: ..."),
-                  Text("Kaç Dakika: ..."),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(
-                          context); // Tamamlandı butonuna basıldığında sayfadan çık
+                  InkWell(
+                    onTap: () {
+                      print("Return to Home");
+                      Navigator.pop(context);
                     },
-                    child: Text("Tamamlandı"),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Process Completed ",
+                          style: fontStyle(25, Colors.black, FontWeight.bold),
+                        ),
+                        FaIcon(
+                          FontAwesomeIcons.check,
+                          color: Colors.green,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

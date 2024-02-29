@@ -19,7 +19,6 @@ class _ExamScreenState extends State<ExamScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getExamList();
   }
@@ -44,7 +43,6 @@ class _ExamScreenState extends State<ExamScreen> {
                       child: ListView.builder(
                         itemCount: examList.length,
                         itemBuilder: (context, index) {
-                          // var exam = examList[index];
                           return Padding(
                             padding: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 20),
@@ -80,7 +78,8 @@ class _ExamScreenState extends State<ExamScreen> {
                                             ),
                                             IconButton(
                                               onPressed: () {
-                                                print("Bu sınavı sil $index");
+                                                print(
+                                                    "Delete this exam $index");
                                               },
                                               icon: FaIcon(
                                                   FontAwesomeIcons.trashCan),
@@ -102,7 +101,7 @@ class _ExamScreenState extends State<ExamScreen> {
                                                 SizedBox(
                                                   width: 5,
                                                 ),
-                                                Text("Question",
+                                                Text("Questions",
                                                     style: fontStyle(
                                                         15,
                                                         Colors.grey.shade500,
@@ -120,7 +119,7 @@ class _ExamScreenState extends State<ExamScreen> {
                                                 SizedBox(
                                                   width: 5,
                                                 ),
-                                                Text("Remaining",
+                                                Text("Duration",
                                                     style: fontStyle(
                                                         15,
                                                         Colors.grey.shade500,
@@ -133,10 +132,10 @@ class _ExamScreenState extends State<ExamScreen> {
                                         ElevatedButton(
                                           onPressed: () {
                                             print(
-                                                "Teste başlıyor ${index + 1} numaralı teste");
+                                                "Starting the test ${index + 1}");
                                             Navigator.push(
                                                 context,
-                                                new MaterialPageRoute(
+                                                MaterialPageRoute(
                                                     builder: (context) =>
                                                         ExamPreviewScreen(
                                                             examIndex: index,
@@ -165,14 +164,13 @@ class _ExamScreenState extends State<ExamScreen> {
                         },
                       ),
                     ),
-                    SizedBox(height: 16), // Adjust the space as needed
+                    SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        // Add your button action here
                         print("Create Exam");
                         Navigator.push(
                             context,
-                            new MaterialPageRoute(
+                            MaterialPageRoute(
                                 builder: (context) => CreateExamScreen()));
                       },
                       style: ElevatedButton.styleFrom(
@@ -195,15 +193,15 @@ class _ExamScreenState extends State<ExamScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            child: Text("Resim"),
+                            child: Text("Image"),
                           ),
                           Container(
                             child: InkWell(
                               onTap: () {
-                                print("Yeni Exam Oluştur");
+                                print("Create a New Exam");
                                 Navigator.push(
                                     context,
-                                    new MaterialPageRoute(
+                                    MaterialPageRoute(
                                         builder: (context) =>
                                             CreateExamScreen()));
                               },

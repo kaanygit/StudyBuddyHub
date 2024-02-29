@@ -16,11 +16,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Map<String, dynamic> userProfile = {};
   bool loadingProfile = true;
+  bool editingScreen = false;
+  late TextEditingController nameController;
+  late TextEditingController educationController;
+  late TextEditingController addressController;
+  late TextEditingController phoneNumberController;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _initializeUserProfile();
+    nameController = TextEditingController();
+    educationController = TextEditingController();
+    addressController = TextEditingController();
+    phoneNumberController = TextEditingController();
   }
 
   Future<void> _initializeUserProfile() async {
@@ -28,14 +37,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       userProfile = user;
       loadingProfile = false;
+      nameController.text = userProfile['displayName'] ?? '';
+      educationController.text = userProfile['educationLevel'] ?? '';
+      addressController.text = userProfile['address'] ?? '';
+      phoneNumberController.text = userProfile['phoneNumber'] ?? '';
     });
-    print(userProfile);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: backgroundColorTwo,
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(15),
@@ -49,14 +61,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         radius: 50,
                         backgroundImage:
                             NetworkImage(userProfile['profilePhoto']),
-                      ))
+                      ),
+                    )
                   : Container(
                       alignment: Alignment.center,
                       child: CircleAvatar(
                         radius: 50,
                         backgroundImage:
                             AssetImage("assets/images/placeholder.png"),
-                      )),
+                      ),
+                    ),
               SizedBox(
                 height: 30,
               ),
@@ -70,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Personal Info",
+                        "Personal Information",
                         style: fontStyle(20, Colors.black, FontWeight.bold),
                       ),
                     ),
@@ -83,10 +97,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text("Name",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text(
-                          !loadingProfile ? userProfile['displayName'] : "Null",
-                          style: fontStyle(17, Colors.black, FontWeight.bold),
-                        ),
+                        !editingScreen
+                            ? Text(
+                                !loadingProfile
+                                    ? userProfile['displayName']
+                                    : "Null",
+                                style: fontStyle(
+                                    17, Colors.black, FontWeight.bold),
+                              )
+                            : Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 90.0),
+                                  child: TextField(
+                                    controller: nameController,
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                     SizedBox(
@@ -98,12 +128,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text("Education Level",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text(
-                            !loadingProfile
-                                ? userProfile['educationLevel']
-                                : "Null",
-                            style:
-                                fontStyle(17, Colors.black, FontWeight.bold)),
+                        !editingScreen
+                            ? Text(
+                                !loadingProfile
+                                    ? userProfile['educationLevel']
+                                    : "Null",
+                                style: fontStyle(
+                                    17, Colors.black, FontWeight.bold),
+                              )
+                            : Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15.0),
+                                  child: TextField(
+                                    controller: educationController,
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                     SizedBox(
@@ -117,9 +161,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: fontStyle(
                               17, Colors.grey.shade800, FontWeight.normal),
                         ),
-                        Text(!loadingProfile ? userProfile['address'] : "Null",
-                            style:
-                                fontStyle(17, Colors.black, FontWeight.bold)),
+                        !editingScreen
+                            ? Text(
+                                !loadingProfile
+                                    ? userProfile['address']
+                                    : "Null",
+                                style: fontStyle(
+                                    17, Colors.black, FontWeight.bold),
+                              )
+                            : Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 75.0),
+                                  child: TextField(
+                                    controller: addressController,
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                     SizedBox(
@@ -141,7 +202,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "Contact Info",
+                        "Contact Information",
                         style: fontStyle(20, Colors.black, FontWeight.bold),
                       ),
                     ),
@@ -151,13 +212,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Phone Number",
+                        Text("Phone",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text(
-                          !loadingProfile ? userProfile['phoneNumber'] : "Null",
-                          style: fontStyle(17, Colors.black, FontWeight.bold),
-                        ),
+                        !editingScreen
+                            ? Text(
+                                !loadingProfile
+                                    ? userProfile['phoneNumber']
+                                    : "Null",
+                                style: fontStyle(
+                                    17, Colors.black, FontWeight.bold),
+                              )
+                            : Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15.0),
+                                  child: TextField(
+                                    controller: phoneNumberController,
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                     SizedBox(
@@ -166,10 +243,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Email",
+                        Text("E-Mail",
                             style: fontStyle(
                                 17, Colors.grey.shade800, FontWeight.normal)),
-                        Text(!loadingProfile ? userProfile['email'] : "Null",
+                        Text(
+                            !loadingProfile
+                                ? /*userProfile['email']*/ "test@test.com"
+                                : "Null",
                             style:
                                 fontStyle(17, Colors.black, FontWeight.bold)),
                       ],
@@ -188,16 +268,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: ElevatedButton(
                         onPressed: () {
-                          print("Edit Personal Data");
-                          FirestoreMethods().setEditProfileBio('Bornovaİzmir',
-                              'Kaan', 'University', '5375019024');
+                          if (editingScreen) {
+                            _saveProfileChanges();
+                          }
+                          setState(() {
+                            editingScreen = !editingScreen;
+                          });
                         },
                         style: ElevatedButton.styleFrom(
                             backgroundColor: textColorThree,
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12))),
                         child: Text(
-                          "Edit",
+                          editingScreen ? "Save" : "Edit",
+                          style: fontStyle(17, Colors.white, FontWeight.normal),
+                        )),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          print("Reset Daily Goal Data");
+                          await FirestoreMethods().resetDailyCounterDataAll();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12))),
+                        child: Text(
+                          "Reset Daily Goal",
                           style: fontStyle(17, Colors.white, FontWeight.normal),
                         )),
                   ),
@@ -208,7 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(
                     child: ElevatedButton(
                         onPressed: () {
-                          print("Sign Out yapılıyor");
+                          print("Signing Out");
                           AuthMethods().signOut();
                           Navigator.push(
                               context,
@@ -226,10 +328,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
               ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          print("Deleting Account");
+                          await FirestoreMethods().deleteAccount();
+                          AuthMethods().signOut();
+                          Navigator.push(
+                              context,
+                              new MaterialPageRoute(
+                                  builder: (context) => new AuthScreen()));
+                        },
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12))),
+                        child: Text(
+                          "Delete Account",
+                          style: fontStyle(17, Colors.white, FontWeight.normal),
+                        )),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _saveProfileChanges() {
+    FirestoreMethods().setEditProfileBio(
+      addressController.text,
+      nameController.text,
+      educationController.text,
+      phoneNumberController.text,
+    );
+    _initializeUserProfile(); // Reload updated data
   }
 }

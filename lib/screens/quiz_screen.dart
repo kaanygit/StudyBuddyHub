@@ -1,328 +1,10 @@
-// import 'dart:async';
-
-// import 'package:flutter/material.dart';
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:studybuddyhub/constants/fonts.dart';
-// import 'package:studybuddyhub/firebase/firestore.dart';
-// import 'package:studybuddyhub/widgets/loading.dart';
-
-// class QuizScreen extends StatefulWidget {
-//   final int quizIndex;
-//   const QuizScreen({required this.quizIndex, Key? key}) : super(key: key);
-
-//   @override
-//   State<QuizScreen> createState() => _QuizScreenState();
-// }
-
-// class _QuizScreenState extends State<QuizScreen>
-//     with SingleTickerProviderStateMixin {
-//   bool loadingExamData = true;
-//   Map<String, dynamic> exam = {};
-//   int durationInSeconds = 0;
-
-//   ColorTween colorTween = ColorTween(
-//     begin: Colors.grey.shade500, // Başlangıç rengi (örneğin mor)
-//     end: textColorTwo, // Bitiş rengi (örneğin gri)
-//   );
-//   int remainingSeconds = 0;
-//   late AnimationController animateController;
-//   late Animation<Color?> colorAnimation;
-
-//   bool isButtonDisabled = false;
-//   int activateQuestionIndex = 0;
-//   List<int> previousQuestion = [];
-//   List<int> postQuestion = [];
-//   List<int> activateQuestionIndexList = [0];
-//   int quizDuration = 0;
-//   late Timer timer;
-//   String timeString = "";
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     getExamData();
-//     animateController = AnimationController(
-//       vsync: this,
-//       duration: Duration(seconds: durationInSeconds),
-//     );
-//     colorAnimation = colorTween.animate(animateController);
-//     colorAnimation.addListener(() {
-//       setState(() {});
-//     });
-//     animateController.addListener(() {
-//       setState(() {
-//         remainingSeconds = durationInSeconds - animateController.value.toInt();
-//       });
-//     });
-
-//     // Forward ile animasyon başlatılır
-
-//     // Timer'ı başlat
-//     startTimer();
-//   }
-
-//   void startTimer() {
-//     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-//       if (durationInSeconds > 0) {
-//         setState(() {
-//           updateTimeString();
-//           durationInSeconds--;
-//         });
-
-//         // Zamanı güncelledikten sonra animasyonu ileriye doğru çalıştır
-//         animateController.forward();
-//       } else {
-//         timer.cancel();
-//         print("Süre Doldu");
-//       }
-//     });
-//   }
-
-//   void updateTimeString() {
-//     int minutes = durationInSeconds ~/ 60;
-//     int seconds = durationInSeconds % 60;
-//     timeString = '$minutes:${seconds.toString().padLeft(2, '0')}';
-//   }
-
-//   Future<void> getExamData() async {
-//     print("Veri Getirme Başladı");
-//     Map<String, dynamic> data = await FirestoreMethods().getProfileBio();
-//     List<dynamic> examList = data['examList'];
-
-//     setState(() {
-//       exam = examList[widget.quizIndex];
-//       quizDuration = exam['duration'] * 60;
-//       remainingSeconds = 1 * 60;
-//       durationInSeconds = 1 * 60;
-//       print(quizDuration);
-//       postQuestion =
-//           List.generate((exam['examList'] as List).length, (index) => index);
-//       postQuestion.remove(0);
-//       loadingExamData = false;
-//     });
-//   }
-
-//   BoxDecoration getDecorationForIndex(int index) {
-//     if (previousQuestion.contains(index)) {
-//       return BoxDecoration(
-//         color: textColorTwo, // Önceki soru rengi
-//         shape: BoxShape.circle,
-//       );
-//     } else if (activateQuestionIndex == index) {
-//       return BoxDecoration(
-//         color: Colors.black, // Aktif soru rengi
-//         shape: BoxShape.circle,
-//       );
-//     } else if (postQuestion.contains(index)) {
-//       return BoxDecoration(
-//         color: Colors.grey, // Sonraki soru rengi
-//         shape: BoxShape.circle,
-//       );
-//     } else {
-//       // Default renk
-//       return BoxDecoration(
-//         color: Colors.grey,
-//         shape: BoxShape.circle,
-//       );
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: backgroundColorTwo,
-//       appBar: AppBar(
-//         backgroundColor: backgroundColorTwo,
-//         leading: GestureDetector(
-//           onTap: () {
-//             showConfirmationPopup(context);
-//           },
-//           child: Container(
-//             child: Icon(
-//               Icons.arrow_back_ios,
-//               color: textColorTwo,
-//             ),
-//           ),
-//         ),
-//         title: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Container(
-//               child: Text("Exam - 1"),
-//             ),
-//             Container(
-//               decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(10), color: Colors.black),
-//               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-//               child: Row(
-//                 children: [
-//                   FaIcon(
-//                     FontAwesomeIcons.clock,
-//                     color: Colors.white,
-//                     size: 15,
-//                   ),
-//                   SizedBox(
-//                     width: 5,
-//                   ),
-//                   Text(
-//                     "${timeString}",
-//                     style: fontStyle(15, Colors.white, FontWeight.normal),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//       body: !loadingExamData
-//           ? Column(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 SingleChildScrollView(
-//                     scrollDirection: Axis.vertical,
-//                     child: Column(
-//                       children: [
-//                         SingleChildScrollView(
-//                             scrollDirection: Axis.horizontal,
-//                             child: Row(
-//                               children: List.generate(
-//                                 (exam['examList'] as List).length,
-//                                 (index) => Container(
-//                                   child: Container(
-//                                       padding: EdgeInsets.all(15),
-//                                       margin: EdgeInsets.all(5),
-//                                       decoration: getDecorationForIndex(index),
-//                                       child: Text(
-//                                         "${index + 1}",
-//                                         style: fontStyle(20, Colors.white,
-//                                             FontWeight.normal),
-//                                       )),
-//                                 ),
-//                               ),
-//                             )),
-//                         // SlideTransition(
-//                         //   position: Tween<Offset>(
-//                         //           begin: Offset(1, 0), end: Offset.zero)
-//                         //       .animate(animateController),
-//                         //   child: Container(
-//                         //     width: double.infinity,
-//                         //     height: 50,
-//                         //     alignment: Alignment.center,
-//                         //     color: textColorTwo,
-//                         //   ),
-//                         // ),
-
-//                         SlideTransition(
-//                           position: Tween<Offset>(
-//                                   begin: Offset(1, 0), end: Offset.zero)
-//                               .animate(animateController),
-//                           child: Container(
-//                             width: double.infinity,
-//                             height: 50,
-//                             alignment: Alignment.center,
-//                             color: colorAnimation
-//                                 .value, // Renk geçişini buradan al
-//                             child: Text(
-//                               "Your Text", // Kutu içinde görünen metin
-//                               style: TextStyle(
-//                                 color: Colors.white, // Metin rengi
-//                                 fontSize: 20,
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-
-//                         Container(child: Text("Soru adgasgasgasg ")),
-//                       ],
-//                     )),
-//                 Container(
-//                   width: double.infinity,
-//                   child: ElevatedButton(
-//                       style: ElevatedButton.styleFrom(
-//                           backgroundColor: textColorTwo,
-//                           fixedSize: Size(200, 50),
-//                           shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(0))),
-//                       onPressed: !isButtonDisabled
-//                           ? () {
-//                               setState(() {
-//                                 activateQuestionIndex++; // Soru indexini bir artır
-//                                 previousQuestion.add(activateQuestionIndex -
-//                                     1); // Önceki sorular listesine ekle
-//                                 postQuestion.remove(activateQuestionIndex - 1);
-//                                 if (activateQuestionIndex >= 9) {
-//                                   print("Sınav Onaylama Ekranı");
-//                                   isButtonDisabled = true;
-//                                 }
-//                               });
-//                             }
-//                           : null,
-//                       child: Text(
-//                         "Next",
-//                         style: fontStyle(20, Colors.white, FontWeight.normal),
-//                       )),
-//                 )
-//               ],
-//             )
-//           : Center(child: LoadingScreen()),
-//     );
-//   }
-
-//   void showConfirmationPopup(BuildContext context) {
-//     showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Container(
-//               child: Text(
-//             'Confirmation',
-//             style: fontStyle(25, textColorTwo, FontWeight.normal),
-//           )),
-//           content: Text('Testi bitirmek?',
-//               style: fontStyle(15, Colors.black, FontWeight.normal)),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(); // Dialog'u kapat
-//               },
-//               child: Text(
-//                 'Hayır',
-//                 style: fontStyle(15, Colors.black, FontWeight.bold),
-//               ),
-//             ),
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop(); // Dialog'u kapat
-//                 Navigator.pop(context);
-//                 print(
-//                   "test sayfasına dönüş",
-//                 );
-//               },
-//               child: Text('Evet',
-//                   style: fontStyle(15, textColorTwo, FontWeight.bold)),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     // Timer ve controller'ı dispose et
-//     timer.cancel();
-//     animateController.dispose();
-//     super.dispose();
-//   }
-// }
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:studybuddyhub/constants/fonts.dart';
 import 'package:studybuddyhub/firebase/firestore.dart';
+import 'package:studybuddyhub/services/gemini.dart';
 import 'package:studybuddyhub/widgets/loading.dart';
 
 class QuizScreen extends StatelessWidget {
@@ -353,8 +35,8 @@ class _QuizScreenState extends State<QuizScreenStateful>
   int durationInSeconds = 0;
 
   ColorTween colorTween = ColorTween(
-    begin: Colors.grey.shade500, // Başlangıç rengi (örneğin mor)
-    end: textColorTwo, // Bitiş rengi (örneğin gri)
+    begin: Colors.grey.shade500,
+    end: textColorTwo,
   );
   int remainingSeconds = 0;
   late AnimationController animateController;
@@ -386,10 +68,8 @@ class _QuizScreenState extends State<QuizScreenStateful>
       });
     });
 
-    // Forward ile animasyon başlatılır
     animateController.forward();
 
-    // Timer'ı başlat
     startTimer();
   }
 
@@ -401,11 +81,10 @@ class _QuizScreenState extends State<QuizScreenStateful>
           durationInSeconds--;
         });
 
-        // Zamanı güncelledikten sonra animasyonu ileriye doğru çalıştır
         animateController.forward();
       } else {
         timer.cancel();
-        print("Süre Doldu");
+        print("Time is up");
       }
     });
   }
@@ -417,9 +96,10 @@ class _QuizScreenState extends State<QuizScreenStateful>
   }
 
   Future<void> getExamData() async {
-    print("Veri Getirme Başladı");
+    print("Data Retrieval Started");
     Map<String, dynamic> data = await FirestoreMethods().getProfileBio();
     List<dynamic> examList = data['examList'];
+    // getQuestionAnswerFuture(examList);
 
     setState(() {
       exam = examList[widget.quizIndex];
@@ -433,24 +113,36 @@ class _QuizScreenState extends State<QuizScreenStateful>
     });
   }
 
+  // Future<void> getQuestionAnswerFuture(List<dynamic> exam) async {
+  //   List<dynamic> questions = exam[0]['examList'];
+  //   List<String> questionListFowardGemini = [];
+  //   for (final question in questions) {
+  //     questionListFowardGemini.add(question['question']);
+  //   }
+
+  //   List<String> responseAnswer =
+  //       await Gemini().geminiQuestionAnswerPrompt(questionListFowardGemini);
+
+  //   print(responseAnswer != [] ? responseAnswer : "Empty List Returned");
+  // }
+
   BoxDecoration getDecorationForIndex(int index) {
     if (previousQuestion.contains(index)) {
       return BoxDecoration(
-        color: textColorTwo, // Önceki soru rengi
+        color: textColorTwo,
         shape: BoxShape.circle,
       );
     } else if (activateQuestionIndex == index) {
       return BoxDecoration(
-        color: Colors.black, // Aktif soru rengi
+        color: Colors.black,
         shape: BoxShape.circle,
       );
     } else if (postQuestion.contains(index)) {
       return BoxDecoration(
-        color: Colors.grey, // Sonraki soru rengi
+        color: Colors.grey,
         shape: BoxShape.circle,
       );
     } else {
-      // Default renk
       return BoxDecoration(
         color: Colors.grey,
         shape: BoxShape.circle,
@@ -480,7 +172,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
           children: [
             Container(
               child: Text(
-                "Exam - 1",
+                "Exam - ${widget.quizIndex + 1}",
                 style: fontStyle(20, Colors.black, FontWeight.bold),
               ),
             ),
@@ -535,8 +227,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                               ),
                             )),
                         LinearProgressIndicator(
-                          value: 1 -
-                              animateController.value, // Geriye doğru animasyon
+                          value: 1 - animateController.value,
                           valueColor:
                               AlwaysStoppedAnimation(colorAnimation.value),
                         ),
@@ -554,7 +245,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                               children: [
                                 Container(
                                     child: Text(
-                                  "CloudWatch use to monitor ?",
+                                  "What is monitored using CloudWatch?",
                                   style: fontStyle(
                                       20, Colors.black, FontWeight.bold),
                                   textAlign: TextAlign.start,
@@ -566,7 +257,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                   children: [
                                     InkWell(
                                       onTap: () {
-                                        print("Soru Cevabı işaretlendi");
+                                        print("Answer Tapped");
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(8),
@@ -589,7 +280,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                           ),
                                           Expanded(
                                             child: Text(
-                                              "Memory utilization of the s3 bucket.",
+                                              "Memory usage of S3 bucket.",
                                               style: fontStyle(15, Colors.black,
                                                   FontWeight.normal),
                                             ),
@@ -602,7 +293,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        print("Soru Cevabı işaretlendi");
+                                        print("Answer Tapped");
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(8),
@@ -625,7 +316,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                           ),
                                           Expanded(
                                             child: Text(
-                                              "Trigger the event after cpu utilization increase by x%.",
+                                              "Trigger event when CPU usage increases by x%.",
                                               style: fontStyle(15, Colors.black,
                                                   FontWeight.normal),
                                             ),
@@ -638,7 +329,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        print("Soru Cevabı işaretlendi");
+                                        print("Answer Tapped");
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(8),
@@ -661,7 +352,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                           ),
                                           Expanded(
                                             child: Text(
-                                              "Unauthorized access to the instances..",
+                                              "Unauthorized access of examples.",
                                               style: fontStyle(15, Colors.black,
                                                   FontWeight.normal),
                                             ),
@@ -674,7 +365,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                     ),
                                     InkWell(
                                       onTap: () {
-                                        print("Soru Cevabı işaretlendi");
+                                        print("Answer Tapped");
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(8),
@@ -697,7 +388,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                           ),
                                           Expanded(
                                             child: Text(
-                                              "Interface and Using Experience..",
+                                              "User Interface and User Experience.",
                                               style: fontStyle(15, Colors.black,
                                                   FontWeight.normal),
                                             ),
@@ -705,8 +396,6 @@ class _QuizScreenState extends State<QuizScreenStateful>
                                         ]),
                                       ),
                                     ),
-
-                                    //CEVAPLARRR
                                   ],
                                 )
                               ],
@@ -724,12 +413,12 @@ class _QuizScreenState extends State<QuizScreenStateful>
                       onPressed: !isButtonDisabled
                           ? () {
                               setState(() {
-                                activateQuestionIndex++; // Soru indexini bir artır
-                                previousQuestion.add(activateQuestionIndex -
-                                    1); // Önceki sorular listesine ekle
+                                activateQuestionIndex++;
+                                previousQuestion.add(activateQuestionIndex - 1);
                                 postQuestion.remove(activateQuestionIndex - 1);
                                 if (activateQuestionIndex >= 9) {
-                                  print("Sınav Onaylama Ekranı");
+                                  print("Confirmation Screen");
+                                  showConfirmationPopup(context);
                                   isButtonDisabled = true;
                                 }
                               });
@@ -753,11 +442,11 @@ class _QuizScreenState extends State<QuizScreenStateful>
         return AlertDialog(
           title: Container(
               child: Text(
-            'Are you sure you want to Submit?',
+            'Are you sure? Do you want to submit?',
             style: fontStyle(25, Colors.black, FontWeight.normal),
           )),
           content: Text(
-              'You are running out of time.  You can’t modify any questions. You must submit the exam now or system will automatically submit your answers in 10 second and shows score.',
+              'Your time is running out. You cannot change any answers. You should submit the exam now, or the system will automatically submit your answers in 10 seconds and show your score.',
               style: fontStyle(13, Colors.grey.shade800, FontWeight.normal)),
           actions: [
             Center(
@@ -767,7 +456,7 @@ class _QuizScreenState extends State<QuizScreenStateful>
                   Container(
                     child: TextButton(
                       onPressed: () {
-                        Navigator.of(context).pop(); // Dialog'u kapat
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         'Continue Test',
@@ -782,13 +471,13 @@ class _QuizScreenState extends State<QuizScreenStateful>
                         borderRadius: BorderRadius.circular(15)),
                     child: TextButton(
                       onPressed: () {
-                        Navigator.of(context).pop(); // Dialog'u kapat
+                        Navigator.of(context).pop();
                         Navigator.pop(context);
                         print(
-                          "test sayfasına dönüş",
+                          "Return to the test page",
                         );
                       },
-                      child: Text('Confirm Submit',
+                      child: Text('Confirm Submission',
                           style: fontStyle(15, Colors.white, FontWeight.bold)),
                     ),
                   ),
@@ -803,7 +492,6 @@ class _QuizScreenState extends State<QuizScreenStateful>
 
   @override
   void dispose() {
-    // Timer ve controller'ı dispose et
     timer.cancel();
     animateController.dispose();
     super.dispose();

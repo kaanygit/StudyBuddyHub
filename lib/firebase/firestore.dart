@@ -35,7 +35,6 @@ class FirestoreMethods {
         'educationLevel': newEducationLevel,
         'phoneNumber': newPhoneNumber,
         'lastUpdated': FieldValue.serverTimestamp(),
-        'examList': []
       });
       print(
           "Profil Verisi Güncellendi"); //buradaki bilgileri güncelliycem sistemdekiyle
@@ -65,7 +64,55 @@ class FirestoreMethods {
     }
   }
 
+  Future<void> addToDailyQuestionData(int question_value) async {
+    try {
+      print("Veri eklemeye başlıyor");
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+        'daily_counter': FieldValue.increment(question_value),
+        'updatedUser': DateTime.now(),
+      });
+      print("Profil verisi güncellendi");
+    } catch (e) {
+      print("Profile veri eklenirken bir hata oluştu");
+    }
+  }
 
+  Future<void> addToDailyData(int question) async {
+    try {
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+        'daily_goal': FieldValue.increment(question),
+        'updatedUser': DateTime.now(),
+        'daily_goal_active': true
+      });
+      print("Profil verisi güncellendi");
+    } catch (e) {
+      print("Profile veri eklenirken bir hata oluştu");
+    }
+  }
+
+  Future<void> resetDailyData() async {
+    try {
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+        'daily_counter': 0,
+        'updatedUser': DateTime.now(),
+      });
+    } catch (e) {
+      print("Veri güncellenirken bir hata oluştu : $e");
+    }
+  }
+
+  Future<void> resetDailyCounterDataAll() async {
+    try {
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).update({
+        'daily_goal': 0,
+        'daily_goal_active': false,
+        'updatedUser': DateTime.now(),
+        'daily_counter': 0,
+      });
+    } catch (e) {
+      print("Veri güncellenirken bir hata oluştu : $e");
+    }
+  }
 
   Future<void> setExamProfileFirestore(
       List<Map<String, dynamic>> examList) async {
@@ -89,6 +136,15 @@ class FirestoreMethods {
     } catch (e) {
       print("Profil Soruları yüklenirken bir hata oluştu: $e");
       return;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      await _firestore.collection('users').doc(_auth.currentUser!.uid).delete();
+      await _auth.currentUser!.delete();
+    } catch (e) {
+      print("Profil verileri silinirken bir hata oluştu : $e");
     }
   }
 }

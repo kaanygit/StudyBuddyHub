@@ -3,7 +3,7 @@ import 'package:studybuddyhub/constants/fonts.dart';
 import 'package:studybuddyhub/screens/chat_screen.dart';
 import 'package:studybuddyhub/screens/exams_screen.dart';
 import 'package:studybuddyhub/screens/profile_screen.dart';
-import 'package:studybuddyhub/screens/search_screen.dart';
+import 'package:studybuddyhub/screens/all_daily_counter_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -75,7 +75,7 @@ class _HomeAppState extends State<HomeApp> {
           BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.comment), label: 'Chat'),
           BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.search), label: "Search"),
+              icon: FaIcon(FontAwesomeIcons.hourglass), label: "Daily"),
           BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.pencil), label: 'Exam'),
           BottomNavigationBarItem(
