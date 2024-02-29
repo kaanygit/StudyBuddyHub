@@ -1,6 +1,6 @@
-# Contributing to [StudyBuddyHub]
+# Contributing to StudyBuddyHub
 
-Welcome to [StudyBuddyHub]! We're excited that you're interested in contributing.
+Welcome to StudyBuddyHub We're excited that you're interested in contributing.
 
 ## Getting Started
 
@@ -55,6 +55,6 @@ Please note that this project is released with a Contributor Code of Conduct. By
 
 ## Need Help?
 
-If you have questions or need help, feel free to open an issue or reach out to [Linkedin]("https://www.linkedin.com/in/yasinkaanyigit1/").
+If you have questions or need help, feel free to open an issue or reach out to [Linkedin](https://www.linkedin.com/in/yasinkaanyigit1/).
 
-Thank you for contributing to [StudyBuddyHub]!
+Thank you for contributing to StudyBuddyHub
